@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import "./userPage.css";
+import { useFetch } from "use-http";
 import { useCookies } from "react-cookie";
 import { usuarios } from "../../mocks/dummyData";
 
@@ -30,6 +31,33 @@ const UserPage = () => {
     { title: "Filme 5", rating: 4.2, comment: "Coito Interrompido." },
     // Adicione mais filmes aqui, se necessário
   ];
+
+  const baseURL = "http://ec2-18-231-160-91.sa-east-1.compute.amazonaws.com:25000/avaliacoes";
+  const { get, response } = useFetch(baseURL);
+  const [aval, setAval] = useState([]);
+
+  const buscar = async () => {
+    try {
+      const resp = await get();
+      console.log("Response:", resp);
+      if (response.ok) {
+        const filteredData = resp.filter(
+          (item) => item.user_id.nome === userId
+        );
+        setAval(filteredData);
+      } else {
+        console.error("Response OK:", response);
+        setAval([]);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setAval([]);
+    }
+  };
+  useEffect(() => {
+    buscar();
+  }, []);
+
 
   // Function to handle editing mode toggle
   const toggleEditing = () => {
@@ -91,21 +119,27 @@ const UserPage = () => {
       <div className="section">
         <h2>Filmes Avaliados</h2>
         <div className="cards-container">
+          {/*
           {moviesReviewed.map((movie, index) => (
             <div className="card" key={index}>
               <div className="placeholder"></div>
               <div className="comment">{movie.comment}</div>{" "}
-              {/* Comentário do filme */}
             </div>
-          ))}
+          ))} */}
+          {/* <button onClick={GetAvaliacao}> clique </button> */}
         </div>
         <div className="movies-info">
-          {moviesReviewed.map((movie, index) => (
-            <div className="movie-info" key={index}>
-              <h3>{movie.title}</h3> {/* Nome do filme */}
-              <p>Avaliação: {movie.rating}</p> {/* Nota do filme */}
-            </div>
-          ))}
+          <div className="mudar_variavel_pf">
+            {aval.map((movie, index) => (
+              <div className="socorro" key={index}>
+                <h3>{movie.obra}</h3> {/* Nome do filme */}
+                <p>Nota: {movie.nota}</p> {/* Nota do filme */}
+                <p>Avaliação: {movie.texto}</p> {/* Nota do filme */}
+                <p>Likes: {movie.numero_likes}</p> {/* Nota do filme */}
+                {movie.user_id.nome === userId ? "" : <p>dar like</p>}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
       {/* Seção de Séries Avaliadas */}
@@ -113,5 +147,4 @@ const UserPage = () => {
     </>
   );
 };
-
 export default UserPage;
