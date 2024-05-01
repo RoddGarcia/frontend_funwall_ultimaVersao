@@ -1,0 +1,77 @@
+/* Centralizando todos os elementos */
+.cadastro-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #1f1d36;
+  color: #fff;
+  font-family: "Open Sans", sans-serif;
+  padding: 20px;
+}
+
+/* Ajustando a largura dos conteúdos */
+.left-content,
+.right-content {
+  width: 50%;
+}
+
+/* Ajustando o tamanho máximo da imagem */
+.left-content img {
+  max-width: 100%;
+  height: auto;
+}
+
+.right-content {
+  padding: 20px;
+}
+
+/* Estilo para o formulário de cadastro */
+.cadastro-form {
+  width: 100%;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.input-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.input-container-cad {
+  width: 48%;
+}
+
+.input-field {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 16px;
+}
+
+.cadastro-button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #7c0000;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.cadastro-button:hover {
+  background-color: #6a0000;
+}
+
+.signup-text {
+  text-align: center;
+  font-size: 14px;
+}
