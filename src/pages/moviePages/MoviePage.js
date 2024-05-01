@@ -13,7 +13,8 @@ import {
   FaRegBookmark,
   FaStar,
 } from "react-icons/fa";
-import { movies } from "../../mocks/dummyData";
+import { useFetch } from "use-http";
+import GetData from "../../scripts/GetData";
 
 const MoviePage = () => {
   const { movieId } = useParams();
@@ -24,32 +25,23 @@ const MoviePage = () => {
   const [comment, setComment] = useState("");
   const [cookies] = useCookies(["user"]);
   const [rated, setRated] = useState(false);
+  const [userAval, setUserAval] = useState({});
 
   // console.log(movieId);
+  const movies = GetData("filmes");
 
-  const movie = movies.find((movie) => movie.id === movieId);
+  const findMovieById = (movies, id) => {
+    return movies.find((movie) => movie.id === parseInt(id));
+  };
 
   useEffect(() => {
-    if (movie) {
-      setMovieInfo(movie);
+    if (movies) {
+      const movie = findMovieById(movies, movieId);
+      if (movie) {
+        setMovieInfo(movie);
+      }
     }
-  }, [movieId]);
-
-  // useEffect(() => {
-  //   const fetchMovieDetails = async () => {
-  //     try {
-  //       const response = await fetch(
-  //         `https://mack-webmobile.vercel.app/api/users/${movieId}`
-  //       );
-  //       const data = await response.json();
-  //       setMovieInfo(data);
-  //     } catch (error) {
-  //       console.error("Error fetching movie details:", error);
-  //     }
-  //   };
-
-  //   fetchMovieDetails();
-  // }, [movieId]);
+  }, [movieId, movies]);
 
   const handleStarHover = (index) => {
     setHoveredStarIndex(index);
@@ -68,22 +60,44 @@ const MoviePage = () => {
     setComment(event.target.value);
   };
 
-  const handleEvaluate = () => {
-    // Perform evaluation logic here
-    if (rating == "" || comment == "") {
+  // TODO - Criar classe PostAvaliacoes.js
+  const baseURLPost = "http://ec2-18-231-160-91.sa-east-1.compute.amazonaws.com:25000/avaliacoes";
+  const { post, response } = useFetch(baseURLPost);
+  const HandleEvaluate = async () => {
+    if (rating === 0 || comment === "") {
       alert("Você não deu uma nota à obra.");
     } else {
-      console.log("Filme: ", movie.titulo);
-      console.log("Rating:", rating);
-      console.log("Comment:", comment);
-      setComment("");
-      window.location.reload();
+      setUserAval({
+        obra: movieInfo.titulo,
+        nota: rating,
+        texto: comment,
+        user_id: { id: cookies.user.id },
+      });
+
+      // console.log("ID do user:", cookies.user.id);
+      // console.log("Nome da obra:" + movieInfo.titulo);
+      // console.log("Nota:", rating);
+      // console.log("Comentário:", comment);
+
+      console.log(userAval);
+      try {
+        const result = await post("", userAval);
+        if (response.ok) {
+          console.log("Avaliação enviada com sucesso:", result);
+
+          window.location.reload();
+        } else {
+          console.error("Erro ao enviar avaliação:", response.data);
+        }
+      } catch (error) {
+        console.error("Erro ao enviar avaliação:", error);
+      }
     }
   };
 
   const handleKeyPress = (event) => {
     if (event.key === "Enter") {
-      handleEvaluate();
+      HandleEvaluate();
     }
   };
 
@@ -177,7 +191,7 @@ const MoviePage = () => {
                         style={{ resize: "none" }}
                         maxLength={128}
                       />
-                      <button onClick={handleEvaluate}>Avaliar</button>
+                      <button onClick={HandleEvaluate}>Avaliar</button>
                       {/* <div>
                         <BsPencilFill size={40} />
                       </div> */}
